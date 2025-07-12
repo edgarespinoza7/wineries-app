@@ -16,7 +16,7 @@ interface WineryProperties {
   name: string
   address: string
   website: string
-  do: string
+  do: string[]
   wine_tours: boolean
   tour_languages: string[]
   children_activities: boolean

@@ -41,9 +41,17 @@ export const Wineries: CollectionConfig = {
     },
     {
       name: 'do',
-      type: 'text',
+      type: 'select',
       label: 'Denominación de Origen',
       required: true,
+      options: [
+        { label: 'DO Alicante', value: 'alicante' },
+        { label: 'DO Utiel-Requena', value: 'utiel-requena' },
+        { label: 'DO Valencia', value: 'valencia' },
+        { label: 'DO Cava', value: 'cava' },
+        { label: 'IGP Castelló', value: 'igp-castello' },
+        { label: 'Vino de Pago', value: 'vino-de-pago' },
+      ],
     },
     {
       name: 'wine_tours',

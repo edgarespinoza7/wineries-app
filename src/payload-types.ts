@@ -172,7 +172,7 @@ export interface Winery {
   location: [number, number];
   address: string;
   website: string;
-  do: string;
+  do: 'alicante' | 'utiel-requena' | 'valencia' | 'cava' | 'igp-castello' | 'vino-de-pago';
   wine_tours?: boolean | null;
   tour_languages?: ('spanish' | 'english' | 'valencian' | 'french' | 'german' | 'russian')[] | null;
   children_activities?: boolean | null;
