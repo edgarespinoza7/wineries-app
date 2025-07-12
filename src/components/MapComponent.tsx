@@ -1,11 +1,40 @@
 'use client'
-
-import Map, { GeolocateControl, NavigationControl, Popup, Layer, Source } from 'react-map-gl/mapbox'
+import { useState, useEffect, useMemo } from 'react'
+import Map, {
+  GeolocateControl,
+  NavigationControl,
+  Popup,
+  Layer,
+  Source,
+  type MapMouseEvent,
+} from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import React, { useState } from 'react'
-import { wineriesGeoJSON, type WineryFeature } from '../data/wineries'
+import type { Feature, Point, FeatureCollection } from 'geojson'
 
-const MapComponent = () => {
+// Define the structure of the properties within our GeoJSON features
+interface WineryProperties {
+  name: string
+  address: string
+  website: string
+  do: string
+  wine_tours: boolean
+  tour_languages: string[]
+  children_activities: boolean
+  starlight_destination: boolean
+  services?: {
+    pet_friendly?: boolean
+    corporate_events?: boolean
+    motorhome_parking?: boolean
+    accommodation?: boolean
+    ev_charging?: boolean
+    restaurant?: boolean
+  }
+}
+
+// Define a specific type for our winery features for better type safety
+type WineryFeature = Feature<Point, WineryProperties>
+
+export default function MapComponent() {
   const [viewport, setViewport] = useState({
     latitude: 39.545586,
     longitude: -0.810916,
@@ -14,20 +43,78 @@ const MapComponent = () => {
 
   const [selectedWinery, setSelectedWinery] = useState<WineryFeature | null>(null)
 
-  interface MapClickEvent {
-    features?: unknown[]
-  }
+  // State for managing fetched data, loading, and errors
+  const [wineries, setWineries] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleMapClick = (e: MapClickEvent) => {
-    const features = e.features
-    const wineryFeature = features && features[0]
+  // Fetch data from Payload CMS when the component mounts
+  useEffect(() => {
+    const fetchWineries = async () => {
+      try {
+        const payloadUrl = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
+        const response = await fetch(`${payloadUrl}/api/wineries?limit=100`)
 
-    if (wineryFeature) {
-      setSelectedWinery(wineryFeature as WineryFeature)
+        if (!response.ok) {
+          throw new Error('Failed to fetch wineries from Payload CMS')
+        }
+
+        const data = await response.json()
+        setWineries(data.docs || []) // Payload returns items in the 'docs' property
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchWineries()
+  }, []) // Empty dependency array ensures this runs only once on mount
+
+  // Transform the fetched data into a GeoJSON FeatureCollection
+  const wineriesGeoJSON = useMemo((): FeatureCollection<Point, WineryProperties> | null => {
+    if (!wineries || wineries.length === 0) return null
+
+    const features: WineryFeature[] = wineries.map((winery: any) => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: winery.location, // Use the 'location' field from Payload
+      },
+      properties: {
+        name: winery.name,
+        address: winery.address,
+        website: winery.website,
+        do: winery.do,
+        wine_tours: winery.wine_tours,
+        services: winery.services,
+        tour_languages: winery.tour_languages,
+        children_activities: winery.children_activities,
+        starlight_destination: winery.starlight_destination,
+      },
+    }))
+
+    return {
+      type: 'FeatureCollection',
+      features,
+    }
+  }, [wineries]) // This memoization re-runs only when the 'wineries' state changes
+
+  const handleMapClick = (e: MapMouseEvent) => {
+    const clickedFeature = e.features && e.features[0]
+
+    if (clickedFeature) {
+      // The feature from the event needs to be cast to our specific type
+      setSelectedWinery(clickedFeature as unknown as WineryFeature)
     } else {
       setSelectedWinery(null)
     }
   }
+
+  // Render loading/error states before attempting to render the map
+  if (isLoading)
+    return <div className="flex items-center justify-center h-screen">Loading Map...</div>
+  if (error) return <div className="flex items-center justify-center h-screen">Error: {error}</div>
 
   return (
     <Map
@@ -40,38 +127,41 @@ const MapComponent = () => {
       }}
       onMove={(evt) => setViewport(evt.viewState)}
       onClick={handleMapClick}
-      interactiveLayerIds={['winery-points']}
+      interactiveLayerIds={['winery-points']} // Make the layer clickable
     >
-      <Source id="wineries" type="geojson" data={wineriesGeoJSON}>
-        <Layer
-          id="winery-points"
-          type="circle"
-          paint={{
-            'circle-radius': 5,
-            'circle-color': '#c94de8',
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#8d34a3',
-          }}
-        />
-      </Source>
-      {selectedWinery && (
+      {/* The Source component now gets its data from our state-derived GeoJSON object */}
+      {wineriesGeoJSON && (
+        <Source id="wineries" type="geojson" data={wineriesGeoJSON}>
+          <Layer
+            id="winery-points"
+            type="circle"
+            paint={{
+              'circle-radius': 6,
+              'circle-color': '#c94de8',
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#ffffff',
+            }}
+          />
+        </Source>
+      )}
+
+      {selectedWinery && selectedWinery.geometry && (
         <Popup
           anchor="top"
-          longitude={Number(selectedWinery.geometry.coordinates[0])}
-          latitude={Number(selectedWinery.geometry.coordinates[1])}
+          longitude={selectedWinery.geometry.coordinates[0]}
+          latitude={selectedWinery.geometry.coordinates[1]}
           onClose={() => setSelectedWinery(null)}
           closeOnClick={false}
-          
         >
           <div className="text-gray-900">
-            <h3 className="text-2xl mb-2">{selectedWinery.properties.name}</h3>
-            <p className="text-xs">{selectedWinery.properties.address}</p>
-            <p className="mb-2">DO: {selectedWinery.properties.do}</p>
+            <h3 className="text-lg font-bold mb-1">{selectedWinery.properties.name}</h3>
+            <p className="text-sm">{selectedWinery.properties.address}</p>
+            <p className="text-sm mb-2">DO: {selectedWinery.properties.do}</p>
             <a
               href={selectedWinery.properties.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 text hover:underline"
+              className="text-blue-600 hover:underline"
             >
               Website
             </a>
@@ -83,5 +173,3 @@ const MapComponent = () => {
     </Map>
   )
 }
-
-export default MapComponent

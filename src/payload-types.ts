@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    wineries: Winery;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +78,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    wineries: WineriesSelect<false> | WineriesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -158,6 +160,36 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineries".
+ */
+export interface Winery {
+  id: string;
+  name: string;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location: [number, number];
+  address: string;
+  website: string;
+  do: string;
+  wine_tours?: boolean | null;
+  tour_languages?: ('spanish' | 'english' | 'valencian' | 'french' | 'german' | 'russian')[] | null;
+  children_activities?: boolean | null;
+  starlight_destination?: boolean | null;
+  services?: {
+    pet_friendly?: boolean | null;
+    corporate_events?: boolean | null;
+    motorhome_parking?: boolean | null;
+    accommodation?: boolean | null;
+    ev_charging?: boolean | null;
+    restaurant?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -170,6 +202,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'wineries';
+        value: string | Winery;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -252,6 +288,33 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineries_select".
+ */
+export interface WineriesSelect<T extends boolean = true> {
+  name?: T;
+  location?: T;
+  address?: T;
+  website?: T;
+  do?: T;
+  wine_tours?: T;
+  tour_languages?: T;
+  children_activities?: T;
+  starlight_destination?: T;
+  services?:
+    | T
+    | {
+        pet_friendly?: T;
+        corporate_events?: T;
+        motorhome_parking?: T;
+        accommodation?: T;
+        ev_charging?: T;
+        restaurant?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
