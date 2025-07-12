@@ -10,7 +10,9 @@ export const Wineries: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
   },
-
+  access: {
+    read: () => true, // Allow public read access
+  },
   // Here we define the fields for our collection
   fields: [
     {

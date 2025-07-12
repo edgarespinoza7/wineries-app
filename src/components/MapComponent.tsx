@@ -139,8 +139,7 @@ export default function MapComponent() {
             paint={{
               'circle-radius': 6,
               'circle-color': '#c94de8',
-              'circle-opacity': 0.6
-              ,
+              'circle-opacity': 0.6,
               'circle-stroke-width': 1.5,
               'circle-stroke-color': '#9f32ba',
             }}
