@@ -114,6 +114,7 @@ export default function MapComponent() {
   // Render loading/error states before attempting to render the map
   if (isLoading)
     return <div className="flex items-center justify-center h-screen">Loading Map...</div>
+
   if (error) return <div className="flex items-center justify-center h-screen">Error: {error}</div>
 
   return (
@@ -138,8 +139,10 @@ export default function MapComponent() {
             paint={{
               'circle-radius': 6,
               'circle-color': '#c94de8',
-              'circle-stroke-width': 2,
-              'circle-stroke-color': '#ffffff',
+              'circle-opacity': 0.6
+              ,
+              'circle-stroke-width': 1.5,
+              'circle-stroke-color': '#9f32ba',
             }}
           />
         </Source>
