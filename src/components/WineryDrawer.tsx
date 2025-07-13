@@ -31,7 +31,7 @@ export function WineryDrawer({ winery, onClose }: WineryDrawerProps) {
   if (isDesktop) {
     return (
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="w-full md:w-1/3 max-w-lg h-full focus:outline-none p-0">
+        <DialogContent className="w-full md:w-1/3 max-w-lg h-full focus:outline-none p-0 left-0 top-0 translate-x-0 translate-y-0 rounded-none border-r data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left">
           {/* We pass the winery data to a shared content component */}
           <DrawerContentComponent winery={winery} />
         </DialogContent>
@@ -60,13 +60,33 @@ function DrawerContentComponent({ winery }: { winery: WineryProperties | null })
     <div className="mx-auto w-full p-4 overflow-y-auto h-full">
       <DrawerHeader>
         <DrawerTitle className="text-2xl">{winery.name}</DrawerTitle>
-        <DrawerDescription>
-          {Array.isArray(winery.do) ? winery.do.join(', ') : winery.do}
-        </DrawerDescription>
+        <DrawerDescription>{`DO: ${winery.do}`}</DrawerDescription>
       </DrawerHeader>
       <div className="p-4 pb-0">
         <p>More details about the winery will go here.</p>
         <p className="mt-4 text-sm text-gray-500">{winery.address}</p>
+        {winery.website && (
+          <p className="mt-2 text-sm text-blue-500">
+            <a href={winery.website} target="_blank" rel="noopener noreferrer">
+              Visit Website
+            </a>
+          </p>
+        )}
+        {winery.services && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Services</h3>
+            <ul className="list-disc pl-5">
+              {Object.entries(winery.services).map(
+                ([key, value]) =>
+                  value && (
+                    <li key={key} className="mt-2">
+                      {key}
+                    </li>
+                  ),
+              )}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   )
