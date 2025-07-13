@@ -22,6 +22,11 @@ interface WineryDrawerProps {
   onClose: () => void
 }
 
+function formatDisplayText(text: string): string {
+  if (!text) return ''
+  return text.replace(/\b\w/g, (l) => l.toUpperCase())
+}
+
 export function WineryDrawer({ winery, onClose }: WineryDrawerProps) {
   // Use the hook to check if the screen is desktop-sized (md breakpoint is 768px)
   const isDesktop = useMediaQuery('(min-width: 1024px)')
@@ -56,17 +61,23 @@ function DrawerContentComponent({ winery }: { winery: WineryProperties | null })
     return null
   }
 
+  console.log(typeof winery.do)
+  console.log(typeof winery.services)
   return (
     <div className="mx-auto w-full p-4 overflow-y-auto h-full">
       <DrawerHeader>
         <DrawerTitle className="text-2xl">{winery.name}</DrawerTitle>
-        <DrawerDescription>{`DO: ${winery.do}`}</DrawerDescription>
+        <DrawerDescription>
+          DO:{' '}
+          {Array.isArray(winery.do)
+            ? winery.do.map(formatDisplayText).join(', ')
+            : formatDisplayText(winery.do)}
+        </DrawerDescription>
       </DrawerHeader>
       <div className="p-4 pb-0">
-        <p>More details about the winery will go here.</p>
         <p className="mt-4 text-sm text-gray-500">{winery.address}</p>
         {winery.website && (
-          <p className="mt-2 text-sm text-blue-500">
+          <p className="mt-4 text-sm text-blue-500">
             <a href={winery.website} target="_blank" rel="noopener noreferrer">
               Visit Website
             </a>
@@ -75,12 +86,12 @@ function DrawerContentComponent({ winery }: { winery: WineryProperties | null })
         {winery.services && (
           <div className="mt-4">
             <h3 className="text-lg font-semibold">Services</h3>
-            <ul className="list-disc pl-5">
+            <ul className="list-disc pl-5 ">
               {Object.entries(winery.services).map(
                 ([key, value]) =>
                   value && (
-                    <li key={key} className="mt-2">
-                      {key}
+                    <li key={key} className="mt-2 text-sm text-gray-600">
+                      {value ? key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) : ''}
                     </li>
                   ),
               )}
