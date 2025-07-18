@@ -35,7 +35,7 @@ export function WineryDrawer({ winery, onClose }: WineryDrawerProps) {
   // Render the Dialog for desktop screens
   if (isDesktop) {
     return (
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={false}>
         <DialogContent className="w-full md:w-1/3 max-w-lg h-full focus:outline-none p-0 left-0 top-0 translate-x-0 translate-y-0 rounded-none border-r data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left">
           {/* We pass the winery data to a shared content component */}
           <DrawerContentComponent winery={winery} />
@@ -48,7 +48,6 @@ export function WineryDrawer({ winery, onClose }: WineryDrawerProps) {
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent className="w-full h-full focus:outline-none">
-        {/* We pass the winery data to the same shared content component */}
         <DrawerContentComponent winery={winery} />
       </DrawerContent>
     </Drawer>

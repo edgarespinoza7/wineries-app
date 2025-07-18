@@ -49,7 +49,7 @@ export const Wineries: CollectionConfig = {
         { label: 'DO Utiel-Requena', value: 'utiel-requena' },
         { label: 'DO Valencia', value: 'valencia' },
         { label: 'DO Cava', value: 'cava' },
-        { label: 'IGP Castelló', value: 'igp-castello' },
+        { label: 'IGP Castelló', value: 'igp-castelló' },
         { label: 'Vino de Pago', value: 'vino-de-pago' },
       ],
     },
