@@ -62,7 +62,7 @@ export default function MapDisplay({ wineries, onWineryClick }: MapDisplayProps)
     <Map
       {...viewport}
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-      mapStyle="mapbox://styles/edgarespinoza7/cmd9eshe304ru01sd7qr91jqe"
+      mapStyle="mapbox://styles/edgarespinoza7/cmd9fah3m00ph01sdf11x29fw"
       style={{
         width: '100vw',
         height: '100vh',
